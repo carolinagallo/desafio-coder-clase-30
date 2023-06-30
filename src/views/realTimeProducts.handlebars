@@ -1,0 +1,113 @@
+<div>
+  <ol id="list">
+    {{#each elementos}}
+    {{#if this}}
+    <div class="card" style="width: 18rem;">
+        <img src={{this.thumbnail}} class="card-img-top" alt="..."/>
+        <div class="card-body">
+          <h5 class="card-title">{{this.title}}</h5>
+          <p class="card-text">{{this.description}}</p>
+          
+        </div>
+      </div>
+    {{/if}}
+    {{/each}}
+  </ol>
+
+
+  <form id="delete" action="">
+    <label for="texto">ID del producto a eliminar</label>
+    <input type="text" id="id" name="id" />
+    <button type="submit">Eliminar</button>
+  </form>
+
+  <form id="create" action="">
+    <label for="texto">Titulo</label>
+    <input type="text" id="title" name="title" />
+
+    <label for="texto">Descripcion</label>
+    <input type="text" id="description" name="description" />
+
+    <label for="texto">Precio</label>
+    <input type="text" id="price" name="price" />
+
+    <label for="texto">Thumbnail</label>
+    <input type="text" id="thumbnail" name="thumbnail" />
+
+    <label for="texto">Codigo</label>
+    <input type="text" id="category" name="category" />
+
+    <label for="texto">Category</label>
+    <input type="text" id="code" name="code" />
+
+    <label for="texto">Stock</label>
+    <input type="text" id="stock" name="stock" />
+
+    <button type="submit">Crear</button>
+  </form>
+
+
+</div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script>
+  const socket = io()
+
+  const formAdd = document.getElementById('create')
+
+  formAdd.addEventListener('submit', function (event) {
+    event.preventDefault()
+
+
+    const title = document.getElementById('title').value
+    const description = document.getElementById('description').value
+    const price = document.getElementById('price').value
+    const thumbnail = document.getElementById('thumbnail').value
+    const category = document.getElementById('category').value
+    const code = document.getElementById('code').value
+    const stock = document.getElementById('stock').value
+
+
+    socket.emit('add', { title, description, price, thumbnail, category, code, stock })
+
+  })
+
+
+  const formDelete = document.getElementById('delete')
+
+  formDelete.addEventListener('submit', function (event) {
+    event.preventDefault()
+
+    const id = document.getElementById('id').value
+    console.log(id)
+    socket.emit('delete', Number(id))
+
+
+  })
+
+  socket.on('newList', (data) => {
+    const list = document.getElementById('list')
+    let listProducts = '';
+
+    data.map((item) => {
+      if (item) listProducts += `<div>Nombre: ${item.title}</div><div>Descripción: ${item.description}</div><br>`;
+    })
+    list.innerHTML = listProducts;
+  })
+
+  socket.on('deleteProduct',(data)=>{
+    const list = document.getElementById('list')
+    let listProducts = '';
+
+    data.map((item) => {
+      if (item) listProducts += `<div>Nombre: ${item.title}</div><div>Descripción: ${item.description}</div><br>`;
+    })
+    list.innerHTML = listProducts;
+
+  })
+
+</script>
